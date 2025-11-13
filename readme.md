@@ -248,12 +248,14 @@ This project is licensed under the MIT License \- see [LICENSE](https://www.goog
 
 ### **Sample Email Input**
 
-<img width="531" height="276" alt="Screenshot 2025-11-14 010252" src="https://github.com/user-attachments/assets/58c4eab4-31d3-49db-be95-df40f5ca5142" />
+<img width="531" height="353" alt="864c62c5-e293-45d5-8f96-5b58b6450722" src="https://github.com/user-attachments/assets/888213d2-953e-4a15-bda4-de672759c8b4" />
+
 
 
 ### **Google Sheet Output**
 
-<img width="906" height="605" alt="Screenshot 2025-11-14 005944" src="https://github.com/user-attachments/assets/11dba322-6364-42f5-966c-e84b8da0a6e2" />
+<img width="866" height="609" alt="Screenshot 2025-11-14 015431" src="https://github.com/user-attachments/assets/8558c6d7-59ae-49b7-be34-684a54a9a9a3" />
+
 
 
 
