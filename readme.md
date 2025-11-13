@@ -222,15 +222,15 @@ Contributions welcome\! Please:
 
 ##  **License**
 
-This project is licensed under the MIT License \- see [LICENSE](https://www.google.com/search?q=LICENSE) file.
+This project is licensed under the MIT License \- see [LICENSE](https://github.com/mansimarisher/ai-expense-splitting-automation-n8n/blob/main/LICENSE) file.
 
 ##  **Author**
 
 **Your Name**
 
-* GitHub: [@yourusername](https://github.com/yourusername)  
-* LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)  
-* Email: your.email@example.com
+* GitHub: [@mansimarisher](https://github.com/mansimarisher)  
+* LinkedIn: [Your Profile](https://www.linkedin.com/in/mansimar-singh26/)  
+* Email: mansimar31@gmail.com
 
 ##  **Acknowledgments**
 
