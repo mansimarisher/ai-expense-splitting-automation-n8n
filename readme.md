@@ -243,7 +243,13 @@ This project is licensed under the MIT License \- see [LICENSE](https://www.goog
 
 ### **Workflow Canvas**
 
+<img width="1742" height="764" alt="Screenshot 2025-11-14 005626" src="https://github.com/user-attachments/assets/718b80b1-c907-43f6-bcf4-632c72cfdc28" />
+
+
 ### **Sample Email Input**
+
+<img width="531" height="276" alt="Screenshot 2025-11-14 010252" src="https://github.com/user-attachments/assets/58c4eab4-31d3-49db-be95-df40f5ca5142" />
+
 
 ### **Google Sheet Output**
 
