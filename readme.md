@@ -247,6 +247,9 @@ This project is licensed under the MIT License \- see [LICENSE](https://www.goog
 
 ### **Google Sheet Output**
 
-### **Query Response**
+<img width="906" height="605" alt="Screenshot 2025-11-14 005944" src="https://github.com/user-attachments/assets/11dba322-6364-42f5-966c-e84b8da0a6e2" />
+
+
+
 
 **⭐ If you found this project helpful, please star the repository\!**
