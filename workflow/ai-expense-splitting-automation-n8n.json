@@ -1,0 +1,582 @@
+{
+  "name": "Expense Splitting Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$json.url}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{JSON.stringify($json.body)}}",
+        "options": {}
+      },
+      "id": "074288a2-37f5-44df-bc1c-57e54d09d26a",
+      "name": "Gemini Parse Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -976,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.item.json.candidates[0].content.parts[0].text;\nconst senderEmail = $input.item.json.senderEmail || ''; // Now it will be available\n\nlet parsed = response.trim();\n\nif (parsed.startsWith('```json')) {\n  parsed = parsed.replace(/```json\\n?/g, '').replace(/```\\n?/g, '');\n} else if (parsed.startsWith('```')) {\n  parsed = parsed.replace(/```\\n?/g, '');\n}\n\nparsed = parsed.trim();\n\nconst data = JSON.parse(parsed);\ndata.senderEmail = senderEmail;\n\nreturn { json: data };"
+      },
+      "id": "4d048aae-2dc1-4550-9743-5f46796821e1",
+      "name": "Parse JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -608,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.type}}",
+              "value2": "query"
+            }
+          ]
+        }
+      },
+      "id": "1ca8aecf-7909-47ff-8384-d0adbb977fde",
+      "name": "Is Query?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=[YOUR_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "[https://docs.google.com/spreadsheets/d/](https://docs.google.com/spreadsheets/d/)[YOUR_GOOGLE_SHEET_ID]/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.Date }}",
+            "Expense Item": "={{ $json['Expense Item'] }}",
+            "Total Expense": "={{ $json['Total Expense'] }}",
+            "User A": "={{ $json['User A'] }}",
+            "User B": "={{ $json['User B'] }}",
+            "User D": "={{ $json['User D'] }}",
+            "User C": "={{ $json['User C'] }}",
+            "Paid By": "={{ $json['Paid By'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Expense Item",
+              "displayName": "Expense Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Expense",
+              "displayName": "Total Expense",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User A",
+              "displayName": "User A",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User B",
+              "displayName": "User B",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User C",
+              "displayName": "User C",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "User D",
+              "displayName": "User D",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Paid By",
+              "displayName": "Paid By",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "48b3f49c-bde3-4706-9999-d608ec719f66",
+      "name": "Append to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        144,
+        -400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "[YOUR_GOOGLE_SHEETS_CREDENTIAL_ID]",
+          "name": "My Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "=[YOUR_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "[https://docs.google.com/spreadsheets/d/](https://docs.google.com/spreadsheets/d/)[YOUR_GOOGLE_SHEET_ID]/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "4ce81489-50db-425e-b7c5-835e6771f9f6",
+      "name": "Read Sheet for Query",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        112,
+        448
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "[YOUR_GOOGLE_SHEETS_CREDENTIAL_ID]",
+          "name": "My Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get query data\nconst queryData = $input.first().json;\nconst person = queryData.person; // e.g., \"User B\"\nconst creditor = queryData.creditor || queryData.asker || 'User A'; // e.g., \"User A\" or \"User D\"\nconst senderEmail = queryData.senderEmail || '';\nconst filterDate = queryData.filterDate || null; // Optional date filter\nconst filterItem = queryData.filterItem || null; // Optional item filter\n\nconsole.log('=== CALCULATE BALANCE ===');\nconsole.log('Person:', person);\nconsole.log('Creditor:', creditor);\nconsole.log('Filter Date:', filterDate);\nconsole.log('Filter Item:', filterItem);\n\n// Get all sheet rows (skip first item which is query data)\nconst sheetRows = $input.all().slice(1);\n\n// Running totals\nlet amountPersonOwesCreditor = 0; // How much 'person' owes 'creditor'\nlet amountCreditorOwesPerson = 0; // How much 'creditor' owes 'person'\n\nfor (const row of sheetRows) {\n  const rowData = row.json;\n  const date = rowData.Date || '';\n  const expenseItem = (rowData['Expense Item'] || '').toLowerCase();\n  const paidBy = rowData['Paid By'] || '';\n  \n  // Apply filters if specified\n  if (filterDate && date !== filterDate) {\n    continue; // Skip this row\n  }\n  \n  if (filterItem && !expenseItem.includes(filterItem.toLowerCase())) {\n    continue; // Skip this row\n  }\n  \n  const personAmount = parseFloat(rowData[person] || 0);\n  const creditorAmount = parseFloat(rowData[creditor] || 0);\n  \n  console.log(`\\nRow: ${expenseItem}, Date: ${date}, Paid by: ${paidBy}`);\n  console.log(`${person} should pay: ${personAmount}, ${creditor} should pay: ${creditorAmount}`);\n  \n  // If creditor paid this expense\n  if (paidBy === creditor) {\n    // Person owes creditor their share\n    amountPersonOwesCreditor += personAmount;\n    console.log(`→ ${creditor} paid, so ${person} owes ${creditor}: +${personAmount}`);\n  }\n  \n  // If person paid this expense\n  if (paidBy === person) {\n    // Creditor owes person their share\n    amountCreditorOwesPerson += creditorAmount;\n    console.log(`→ ${person} paid, so ${creditor} owes ${person}: +${creditorAmount}`);\n  }\n}\n\nconsole.log(`\\n=== TOTALS ===`);\nconsole.log(`${person} owes ${creditor}: ${amountPersonOwesCreditor}`);\nconsole.log(`${creditor} owes ${person}: ${amountCreditorOwesPerson}`);\n\n// Calculate net balance\nconst netBalance = amountPersonOwesCreditor - amountCreditorOwesPerson;\n\nconsole.log(`Net balance: ${netBalance}`);\n\nlet message = '';\n\nif (netBalance > 0) {\n  message = `${person} owes ${creditor} Rs ${Math.abs(netBalance).toFixed(2)}`;\n} else if (netBalance < 0) {\n  message = `${creditor} owes ${person} Rs ${Math.abs(netBalance).toFixed(2)}`;\n} else {\n  message = `${person} and ${creditor} are settled up!`;\n}\n\n// Add filter info to message if applicable\nif (filterDate || filterItem) {\n  message += '\\n\\n(Filtered by: ';\n  if (filterItem) message += `\"${filterItem}\"`;\n  if (filterDate && filterItem) message += ' on ';\n  if (filterDate) message += `${filterDate}`;\n  message += ')';\n}\n\nreturn { \n  json: { \n    message: message,\n    person: person,\n    creditor: creditor,\n    netBalance: netBalance,\n    personOwesCreditor: amountPersonOwesCreditor,\n    creditorOwesPerson: amountCreditorOwesPerson,\n    senderEmail: senderEmail\n  } \n};"
+      },
+      "id": "772e0da5-7f1f-4c1a-8d5a-84476b675c7d",
+      "name": "Calculate Balance",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.senderEmail }}",
+        "subject": "=Expense Query Response",
+        "message": "={{$json.message}}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c4d2bcde-82b8-40e2-a6c0-683f6a5cbcb6",
+      "name": "Send Query Response",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        448
+      ],
+      "webhookId": "db768bca-2292-4c02-bebc-423748da6417",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "[YOUR_GMAIL_CREDENTIAL_ID]",
+          "name": "My Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.item.json;\nconst splits = data.splits || {};\n\n// Normalize the splits\nconst normalizedSplits = {};\nfor (const [key, value] of Object.entries(splits)) {\n  const normalizedKey = key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();\n  normalizedSplits[normalizedKey] = value;\n}\n\n// Create base row\nconst row = {\n  'Date': data.date || '',\n  'Expense Item': data.item || '',\n  'Total Expense': data.total || 0\n};\n\n// Add all people\nconst knownPeople = ['User A', 'User B', 'User C', 'User D'];\n\nfor (const person of knownPeople) {\n  row[person] = normalizedSplits[person] || 0;\n}\n\n// Add Paid By column\nrow['Paid By'] = data.paidBy || 'User A';\n\n// Add sender email\nrow['senderEmail'] = data.senderEmail || '';\n\nreturn { json: row };"
+      },
+      "id": "de4a0c4c-3fe2-4e0d-803b-f97aecd6a001",
+      "name": "Format for Sheet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$json.senderEmail}}",
+        "subject": "=Expense Recorded",
+        "message": "=Your expense has been recorded successfully!\n\nExpense Item: {{ $json.expenseItem }} ,\nAmount: {{ $json.totalExpense }}Rs ,\nDate: {{ $json.date }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "ca3e1360-e713-47f6-bc6b-dfbce9a57831",
+      "name": "Send Expense Confirmation",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        -176
+      ],
+      "webhookId": "64e2570a-0c94-4a6e-b048-4ff0af02dfd5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "[YOUR_GMAIL_CREDENTIAL_ID]",
+          "name": "My Gmail Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const emailData = $input.item.json;\n\nconsole.log('=== EMAIL DATA (Resolved Format) ===');\nconsole.log('Keys:', Object.keys(emailData));\n\n// Extract sender email from resolved format\nlet senderEmail = '';\nif (emailData.from) {\n  if (emailData.from.address) {\n    senderEmail = emailData.from.address;\n  } else if (emailData.from.value && emailData.from.value[0]) {\n    senderEmail = emailData.from.value[0].address;\n  }\n}\n\n// Extract body from resolved format\nlet body = emailData.textPlain || emailData.text || emailData.snippet || '';\n\nconsole.log('Sender:', senderEmail);\nconsole.log('Body:', body);\n\nreturn {\n  json: {\n    ...emailData,\n    extractedBody: body,\n    senderEmail: senderEmail\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        48
+      ],
+      "id": "35957b19-62a0-4fb8-900b-87fb5dd7c169",
+      "name": "debug email"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiKey = \"[YOUR_GEMINI_API_KEY]\";\n\nconst emailBody = $input.item.json.extractedBody || $input.item.json.textPlain || $input.item.json.snippet || '';\nconst senderEmail = $input.item.json.senderEmail || '';\n\nconst prompt = `Analyze this email for expense splitting.\n\nExtract and return ONLY this JSON format (no markdown, no explanation):\n\nFor EXPENSE: \n{\"type\": \"expense\", \"date\": \"YYYY-MM-DD\", \"item\": \"description\", \"total\": number, \"splits\": {\"Person1\": amount, \"Person2\": amount}, \"paidBy\": \"PersonName\"}\n\nFor QUERY: \n{\"type\": \"query\", \"person\": \"PersonWhoOwes\", \"creditor\": \"PersonWhoIsOwed\", \"filterDate\": \"YYYY-MM-DD or null\", \"filterItem\": \"keyword or null\"}\n\nRules for EXPENSE:\n- \"Split X between/with A, B, C\" means divide X equally among all people INCLUDING \"me\"\n- \"Me\" or \"I\" = \"User A\"\n- Always capitalize person names: \"User A\", \"User B\", \"User C\", \"User D\"\n- Count all people mentioned and divide equally (unless percentages specified)\n- Extract date if mentioned, otherwise use: ${new Date().toISOString().split('T')[0]}\n- \"paid by X\" or \"X paid\" = paidBy is X\n- If no paidBy mentioned, default to \"User A\"\n\nRules for QUERY:\n- \"How much does X owe Y\" → person: X, creditor: Y\n- \"How much does X owe me\" → person: X, creditor: \"User A\"\n- \"How much do I owe X\" → person: \"User A\", creditor: X\n- If query mentions a specific date like \"for farewell on 30 Oct 2025\", extract filterDate: \"2025-10-30\"\n- If query mentions event name like \"for birthday cake\" or \"for farewell party\", extract filterItem: \"birthday cake\" or \"farewell party\"\n- If no specific date/event mentioned, use null for both filters\n\nExamples:\nQuery: \"How much does User B owe me?\"\n→ {\"type\":\"query\",\"person\":\"User B\",\"creditor\":\"User A\",\"filterDate\":null,\"filterItem\":null}\n\nQuery: \"How much does User B owe me for farewell party on 1st April 2025?\"\n→ {\"type\":\"query\",\"person\":\"User B\",\"creditor\":\"User A\",\"filterDate\":\"2025-04-01\",\"filterItem\":\"farewell party\"}\n\nQuery: \"How much do I owe User D for birthday cake?\"\n→ {\"type\":\"query\",\"person\":\"User A\",\"creditor\":\"User D\",\"filterDate\":null,\"filterItem\":\"birthday cake\"}\n\nEmail: ${emailBody}`;\n\nreturn {\n  json: {\n    url: `https://generativelace.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,\n    body: {\n      contents: [{\n        parts: [{\n          text: prompt\n        }]\n      }]\n    },\n    senderEmail: senderEmail,\n    debugBody: emailBody\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1184,
+        48
+      ],
+      "id": "1037734e-3934-4c96-9f47-32278562e942",
+      "name": "Build Gemini Request"
+    },
+    {
+      "parameters": {
+        "format": "resolved",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2.1,
+      "position": [
+        -1584,
+        48
+      ],
+      "id": "dbdfacf3-a289-421e-a6b9-30130259ffce",
+      "name": "Email Trigger (IMAP)",
+      "credentials": {
+        "imap": {
+          "id": "[YOUR_IMAP_CREDENTIAL_ID]",
+          "name": "My IMAP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the data from Format for Sheet\nconst inputData = $input.item.json;\n\n// Extract all the fields we need\nconst senderEmail = inputData.senderEmail || '';\nconst expenseItem = inputData['Expense Item'] || '';\nconst totalExpense = inputData['Total Expense'] || 0;\nconst dateValue = inputData.Date || '';\n\nconsole.log('Sender email:', senderEmail);\n\nreturn {\n  json: {\n    senderEmail: senderEmail,\n    expenseItem: expenseItem,\n    totalExpense: totalExpense,\n    date: dateValue\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -176
+      ],
+      "id": "67634ada-ab25-417d-b73a-5f5365efcf31",
+      "name": "sender email"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the API response\nconst apiResponse = $input.item.json;\n\n// Get the sender email from Build Gemini Request node\nconst buildGeminiData = $('Build Gemini Request').first().json;\nconst senderEmail = buildGeminiData.senderEmail || '';\n\nconsole.log('Sender email from Build Gemini:', senderEmail);\n\n// Return API response with sender email attached\nreturn {\n  json: {\n    ...apiResponse,\n    senderEmail: senderEmail\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        48
+      ],
+      "id": "aff8c85f-dffa-4acb-a6cf-e89e9fad6fae",
+      "name": "email merger "
+    },
+    {
+      "parameters": {
+        "jsCode": "const queryData = $input.item.json;\n\nconsole.log('=== ADD SENDER TO QUERY ===');\nconsole.log('Full queryData:', JSON.stringify(queryData, null, 2));\n\nlet senderEmail = queryData.senderEmail || '';\n\nif (!senderEmail) {\n  try {\n    senderEmail = $('Parse JSON').first().json.senderEmail || '';\n  } catch (e) {}\n}\n\n// Extract the fields - handle both old and new field names\nconst person = queryData.person || queryData.personWhoOwes || '';\nconst creditor = queryData.creditor || queryData.personWhoIsOwed || 'User A';\n\nconsole.log('Extracted person:', person);\nconsole.log('Extracted creditor:', creditor);\n\nreturn {\n  json: {\n    type: queryData.type,\n    person: person,\n    creditor: creditor,\n    filterDate: queryData.filterDate || null,\n    filterItem: queryData.filterItem || null,\n    senderEmail: senderEmail\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        448
+      ],
+      "id": "27c03757-bd25-4d60-88fa-f5e98131e62b",
+      "name": "Add Sender to Query"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.item.json;\n\nconsole.log('=== FULL INPUT DATA ===');\nconsole.log('All keys:', Object.keys(inputData));\nconsole.log('Full data:', JSON.stringify(inputData));\n\n// Try multiple ways to get sender email\nlet senderEmail = '';\n\nif (inputData.senderEmail) {\n  senderEmail = inputData.senderEmail;\n  console.log('Got from inputData.senderEmail:', senderEmail);\n}\n\nif (!senderEmail && inputData.sender) {\n  senderEmail = inputData.sender;\n  console.log('Got from inputData.sender:', senderEmail);\n}\n\n// Try getting from Calculate Balance node directly\nif (!senderEmail) {\n  try {\n    const calcData = $('Calculate Balance').first().json;\n    senderEmail = calcData.senderEmail || '';\n    console.log('Got from Calculate Balance node:', senderEmail);\n  } catch (e) {\n    console.log('Error getting from Calculate Balance:', e);\n  }\n}\n\nconsole.log('Final sender email:', senderEmail);\n\nreturn {\n  json: {\n    message: inputData.message,\n    senderEmail: senderEmail,\n    person: inputData.person,\n    asker: inputData.asker,\n    balance: inputData.balance\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        448
+      ],
+      "id": "7a897413-ff3b-44ac-a2a4-eaf8a14ccca1",
+      "name": "Prepare Query Email",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the query info from Add Sender to Query node\nconst queryInfo = $('Add Sender to Query').first().json;\n\nconsole.log('=== MERGE QUERY DATA ===');\nconsole.log('Query info person:', queryInfo.person);\nconsole.log('Query info creditor:', queryInfo.creditor);\nconsole.log('Query info senderEmail:', queryInfo.senderEmail);\n\n// Get all sheet data rows\nconst sheetData = $input.all();\n\nconsole.log('Number of sheet rows:', sheetData.length);\n\n// Create output array\nconst output = [];\n\n// First item: merge query data with first sheet row\noutput.push({\n  json: {\n    person: queryInfo.person,\n    creditor: queryInfo.creditor,\n    filterDate: queryInfo.filterDate,\n    filterItem: queryInfo.filterItem,\n    senderEmail: queryInfo.senderEmail,\n    // Also include first sheet row data\n    ...(sheetData[0] ? sheetData[0].json : {})\n  }\n});\n\n// Add remaining sheet rows\nfor (let i = 1; i < sheetData.length; i++) {\n  output.push(sheetData[i]);\n}\n\nconsole.log('Output first item person:', output[0].json.person);\nconsole.log('Output first item creditor:', output[0].json.creditor);\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        448
+      ],
+      "id": "afc98604-9bba-41f6-940f-d05df2c780a9",
+      "name": "Merge Query with Sheet Data"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gemini Parse Email": {
+      "main": [
+        [
+          {
+            "node": "email merger ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON": {
+      "main": [
+        [
+          {
+            "node": "Is Query?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Query?": {
+      "main": [
+        [
+          {
+            "node": "Add Sender to Query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format for Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for Sheet": {
+      "main": [
+        [
+          {
+            "node": "Append to Sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "sender email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Read Sheet for Query": {
+      "main": [
+        [
+          {
+            "node": "Merge Query with Sheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Balance": {
+      "main": [
+        [
+          {
+            "node": "Prepare Query Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Gemini Request": {
+      "main": [
+        [
+          {
+            "node": "Gemini Parse Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "debug email": {
+      "main": [
+        [
+          {
+            "node": "Build Gemini Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Trigger (IMAP)": {
+      "main": [
+        [
+          {
+            "node": "debug email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sender email": {
+      "main": [
+        [
+          {
+            "node": "Send Expense Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "email merger ": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Sender to Query": {
+      "main": [
+        [
+          {
+            "node": "Read Sheet for Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Query Email": {
+      "main": [
+        [
+          {
+            "node": "Send Query Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Query with Sheet Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Balance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1615f91c-084a-4697-a8ad-e772defd4d9b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "[YOUR_N8N_INSTANCE_ID]"
+  },
+  "id": "zttUIqcGaZvZf1eD",
+  "tags": []
+}
